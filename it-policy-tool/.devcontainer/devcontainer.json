@@ -1,0 +1,22 @@
+{
+  "name": "IT Policy Tool",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend",
+      "onAutoForward": "openPreview"
+    },
+    "3001": {
+      "label": "Backend API",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "README.md"
+      ]
+    }
+  }
+}
