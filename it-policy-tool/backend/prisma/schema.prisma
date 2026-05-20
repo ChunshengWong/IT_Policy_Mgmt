@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Policy {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  content     String
+  version     String   @default("1.0.0")
+  status      String   @default("draft")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  standards   Standard[]
+  versions    PolicyVersion[]
+  comparisons Comparison[]
+}
+
+model Standard {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  content     String
+  policyId    String
+  version     String   @default("1.0.0")
+  status      String   @default("draft")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  policy      Policy     @relation(fields: [policyId], references: [id])
+  sops        SOP[]
+  versions    StandardVersion[]
+  comparisons Comparison[]
+}
+
+model SOP {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  content     String
+  standardId  String
+  version     String   @default("1.0.0")
+  status      String   @default("draft")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  standard    Standard     @relation(fields: [standardId], references: [id])
+  versions    SOPVersion[]
+  comparisons Comparison[]
+}
+
+model RegulatoryRequirement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  source      String
+  category    String
+  effectiveDate DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  comparisons Comparison[]
+}
+
+model PolicyVersion {
+  id        String   @id @default(cuid())
+  policyId  String
+  version   String
+  content   String
+  createdAt DateTime @default(now())
+  
+  policy    Policy @relation(fields: [policyId], references: [id])
+}
+
+model StandardVersion {
+  id         String   @id @default(cuid())
+  standardId String
+  version    String
+  content    String
+  createdAt  DateTime @default(now())
+  
+  standard  Standard @relation(fields: [standardId], references: [id])
+}
+
+model SOPVersion {
+  id        String   @id @default(cuid())
+  sopId     String
+  version   String
+  content   String
+  createdAt DateTime @default(now())
+  
+  sop  SOP @relation(fields: [sopId], references: [id])
+}
+
+model Comparison {
+  id                     String   @id @default(cuid())
+  regulatoryReqId        String
+  policyId               String?
+  standardId             String?
+  sopId                  String?
+  status                 String   @default("pending")
+  notes                  String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  
+  regulatoryReq  RegulatoryRequirement @relation(fields: [regulatoryReqId], references: [id])
+  policy         Policy?                @relation(fields: [policyId], references: [id])
+  standard       Standard?              @relation(fields: [standardId], references: [id])
+  sop            SOP?                   @relation(fields: [sopId], references: [id])
+}
